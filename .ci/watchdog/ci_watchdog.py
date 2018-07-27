@@ -78,7 +78,7 @@ def main(args):
 
     # Default variables
     job_name = 'Onnx_CI'
-    valid_footer = "___________________________________ summary ____________________________________"
+    valid_footer = "py3: commands succeeded"
     build_duration_treshold = datetime.timedelta(minutes=40)
     ci_start_treshold = datetime.timedelta(minutes=40)
     now_time = datetime.datetime.now()
@@ -110,18 +110,19 @@ def main(args):
                 if "Build finished" in stat.description:
                     build_no = retrieve_build_number(stat.target_url, job_name)
                     log.info("\tBuild %s: FINISHED", str(build_no))
-                    if valid_footer not in build_output(jenk,build_no, job_name):
-                        communicate_fail("Onnx CI job build #{}, for PR #{} failed critically!".format(build_no, pr.number), pr.html_url, slack_app)
+                    if "FAILURE" in (jenk.get_build_info(job_name, build_no)["result"]):
+                        #communicate_fail("Onnx CI job build #{}, for PR #{}, failed to run tests!".format(build_no, pr.number), pr.html_url, slack_app)
+                        log.info("\tCI build %s for PR #%s finished with failure.", str(build_no), str(pr.number))
                     else:
                         log.info("\tCI build %s for PR #%s finished successfully.", str(build_no), str(pr.number))
                     break
                 # CI build in progress                
                 elif "Testing in progress" in stat.description:
                     build_no = retrieve_build_number(stat.target_url, job_name)
-                    build_timestamp = (jenk.get_build_info(job_name,build_no))['timestamp']
-                    build_start_time = datetime.datetime.fromtimestamp(build_timestamp/1000.0)
+                    build_duration = (jenk.get_build_info(job_name,build_no))['duration']
+                    build_duration = datetime.timedelta(milliseconds=build_duration)
                     log.info("\tBuild %s: IN PROGRESS, started: %s", str(build_no), str(build_start_time))
-                    if now_time - build_start_time > build_duration_treshold:
+                    if build_duration > build_duration_treshold:
                         # CI job froze, communiate failure
                         communicate_fail("Onnx CI job build #{}, for PR #{} started, but did not finish in designated time!".format(build_no, pr.number), pr.html_url, slack_app)
                     break
