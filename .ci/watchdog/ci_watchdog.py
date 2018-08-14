@@ -163,6 +163,7 @@ def main(args):
     # Time tresholds
     build_duration_treshold = datetime.timedelta(minutes=60)
     ci_start_treshold = datetime.timedelta(minutes=10)
+    ci_queue_treshold = datetime.timedelta(minutes=2)
     awaiting_jenkins_treshold = datetime.timedelta(minutes=5)
     now_time = get_git_time(git)
     # Load jenkins token and log in, retrieve job list
@@ -213,7 +214,7 @@ def main(args):
                             if now_time - build_datetime > ci_start_treshold:
                                 config = communicate_fail("Onnx CI job build #{}, for PR #{} waiting in queue after {} minutes".format(build_no, pr.number, str(now_time - build_datetime)), pr, slack_app, config, message_severity=2)
                                 break
-                            if get_idle_ci_hosts(jenk) > 0:
+                            if get_idle_ci_hosts(jenk) > 0 and now_time - build_datetime > ci_queue_treshold:
                                 config = communicate_fail("Onnx CI job build #{}, for PR #{} waiting in queue, despite idle executors!".format(build_no, pr.number), pr, slack_app, config)
                                 break
                     except:
