@@ -154,7 +154,7 @@ def main(args):
     jenkins_token = open(args.jenkins_token).read().replace('\n','').strip()
     hosts_update = datetime.timedelta(hours=args.hosts_update)
     # Default variables
-    job_name = 'Onnx_CI'
+    job_name = 'nGraph-ONNX-CI'
     # Create Slack api object
     slack_app = SlackCommunicator(slack_token)
     # Load github token and log in, retrieve pull requests
