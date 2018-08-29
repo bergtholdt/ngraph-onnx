@@ -28,7 +28,7 @@ from __future__ import unicode_literals
 import numpy as np
 import ngraph as ng
 import onnx
-from cachetools.func import lru_cache
+from functools import lru_cache
 
 from onnx.helper import make_tensor_value_info, make_graph, make_model
 from onnx.backend.base import Backend, BackendRep

@@ -20,7 +20,7 @@ import numpy as np
 import onnx
 import onnx.numpy_helper
 import onnx.mapping
-from cachetools.func import lru_cache
+from functools import lru_cache
 from google import protobuf
 from typing import Any, Dict, Optional, List
 from ngraph.impl import Node as NgraphNode
